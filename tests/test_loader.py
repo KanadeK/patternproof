@@ -59,6 +59,13 @@ def test_load_pattern_returns_immutable_rectangular_model(tmp_path: Path) -> Non
             ),
             "duplicates palette color",
         ),
+        (
+            lambda data: data.update(
+                palette={"=1+1": {"name": "Formula", "color": "#d84a62"}},
+                cells=[["=1+1"]],
+            ),
+            "keys",
+        ),
     ],
 )
 def test_load_pattern_rejects_invalid_schema(
@@ -90,3 +97,19 @@ def test_load_pattern_rejects_non_object_root(tmp_path: Path) -> None:
 def test_load_pattern_reports_unreadable_path(tmp_path: Path) -> None:
     with pytest.raises(PatternInputError, match="cannot read UTF-8 pattern"):
         load_pattern(tmp_path / "missing.json")
+
+
+def test_load_pattern_rejects_file_larger_than_input_budget(tmp_path: Path) -> None:
+    path = tmp_path / "oversized.json"
+    path.write_bytes(b" " * 8_000_001)
+
+    with pytest.raises(PatternInputError, match="no more than 8000000 bytes"):
+        load_pattern(path)
+
+
+def test_load_pattern_rejects_non_utf8_bytes(tmp_path: Path) -> None:
+    path = tmp_path / "binary.json"
+    path.write_bytes(b"\xff")
+
+    with pytest.raises(PatternInputError, match="cannot read UTF-8 pattern"):
+        load_pattern(path)

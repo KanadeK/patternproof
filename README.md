@@ -75,8 +75,10 @@ intentional background cell.
 }
 ```
 
-Colors are six-digit sRGB hexadecimal values. A grid may contain at most 512 rows, 512
-columns, and 65,536 cells; a palette may contain at most 256 distinct colors. The
+Colors are six-digit sRGB hexadecimal values. Palette keys use 1–32 ASCII letters,
+digits, dots, dashes, or underscores and must start with a letter or digit. A grid may
+contain at most 512 rows, 512 columns, and 65,536 cells; a palette may contain at most
+256 distinct colors, and the JSON file may contain at most 8,000,000 bytes. The
 committed [example pattern](examples/pattern.json) is a complete working input.
 
 ## Status and exit behavior

@@ -105,6 +105,43 @@ def test_cli_invalid_image_exits_two_without_output(
     assert "cannot decode capture" in captured.err
 
 
+def test_cli_decompression_bomb_exits_two_without_output(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pattern, capture = write_inputs(tmp_path)
+    output = tmp_path / "report"
+
+    def reject_oversized_image(path: Path) -> Image.Image:
+        raise Image.DecompressionBombError(f"unsafe decoded dimensions in {path}")
+
+    monkeypatch.setattr("patternproof.cli.Image.open", reject_oversized_image)
+
+    exit_code = main(["analyze", str(pattern), str(capture), "--out", str(output)])
+
+    assert exit_code == 2
+    assert not output.exists()
+    captured = capsys.readouterr()
+    assert "cannot decode capture" in captured.err
+
+
+def test_cli_rejects_image_format_outside_capture_contract(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    pattern, _ = write_inputs(tmp_path)
+    capture = tmp_path / "capture.bmp"
+    Image.new("RGB", (40, 20)).save(capture)
+    output = tmp_path / "report"
+
+    exit_code = main(["analyze", str(pattern), str(capture), "--out", str(output)])
+
+    assert exit_code == 2
+    assert not output.exists()
+    captured = capsys.readouterr()
+    assert "PNG, JPEG, or WebP" in captured.err
+
+
 def test_cli_refuses_to_overwrite_report_directory(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

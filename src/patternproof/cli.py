@@ -7,7 +7,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 
 from patternproof import __version__
 from patternproof.analysis import MAX_IMAGE_PIXELS, AnalysisOptions, analyze
@@ -22,13 +22,15 @@ class CaptureInputError(ValueError):
 def _load_capture(path: Path) -> Image.Image:
     try:
         with Image.open(path) as source:
+            if source.format not in {"PNG", "JPEG", "WEBP"}:
+                raise CaptureInputError("capture must be a PNG, JPEG, or WebP image")
             if source.width * source.height > MAX_IMAGE_PIXELS:
                 raise CaptureInputError(
                     f"capture contains more than {MAX_IMAGE_PIXELS} decoded pixels"
                 )
             source.load()
             return source.convert("RGB")
-    except (OSError, UnidentifiedImageError) as error:
+    except (OSError, Image.DecompressionBombError) as error:
         raise CaptureInputError(f"cannot decode capture {path}: {error}") from error
 
 

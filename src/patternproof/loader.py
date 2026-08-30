@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import NoReturn
 
@@ -11,8 +12,10 @@ from patternproof.model import PaletteEntry, Pattern, Rgb, immutable_mapping
 
 _ROOT_FIELDS = {"version", "name", "empty_color", "palette", "cells"}
 _PALETTE_FIELDS = {"name", "color"}
+_PALETTE_KEY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$")
 _MAX_GRID_SIDE = 512
 _MAX_GRID_CELLS = 65_536
+_MAX_PATTERN_BYTES = 8_000_000
 
 
 class PatternInputError(ValueError):
@@ -46,8 +49,11 @@ def _parse_palette(value: object) -> dict[str, PaletteEntry]:
     result: dict[str, PaletteEntry] = {}
     seen_colors: dict[Rgb, str] = {}
     for key, raw_entry in source.items():
-        if not key or len(key) > 32:
-            _fail("palette", "keys must contain 1 to 32 characters")
+        if _PALETTE_KEY.fullmatch(key) is None:
+            _fail(
+                "palette",
+                "keys must use 1 to 32 ASCII letters, digits, dots, dashes, or underscores",
+            )
         entry = _as_object(raw_entry, f"palette.{key}")
         unknown = set(entry) - _PALETTE_FIELDS
         missing = _PALETTE_FIELDS - set(entry)
@@ -107,8 +113,15 @@ def load_pattern(path: Path) -> Pattern:
     """Load and strictly validate a version-one pattern file."""
 
     try:
-        text = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError) as error:
+        with path.open("rb") as handle:
+            encoded = handle.read(_MAX_PATTERN_BYTES + 1)
+    except OSError as error:
+        raise PatternInputError(f"{path}: cannot read UTF-8 pattern: {error}") from error
+    if len(encoded) > _MAX_PATTERN_BYTES:
+        raise PatternInputError(f"{path}: must contain no more than {_MAX_PATTERN_BYTES} bytes")
+    try:
+        text = encoded.decode("utf-8")
+    except UnicodeError as error:
         raise PatternInputError(f"{path}: cannot read UTF-8 pattern: {error}") from error
 
     try:

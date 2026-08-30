@@ -101,9 +101,10 @@ fixtures, not claims about uncontrolled phone photography.
 ## Input Contract
 
 The pattern is JSON schema version 1 with a rectangular `cells` array. Each cell is a
-palette key or `null` for intentional background. Palette colors and `empty_color` are
-six-digit hexadecimal sRGB values. The capture must already be cropped to the outside
-edge of the rectangular grid.
+palette key or `null` for intentional background. Palette keys are 1–32 ASCII letters,
+digits, dots, dashes, or underscores and begin with a letter or digit. Palette colors
+and `empty_color` are six-digit hexadecimal sRGB values. The capture must be PNG, JPEG,
+or WebP and already be cropped to the outside edge of the rectangular grid.
 
 The center of each physical cell is sampled after an explicit inset. Its median RGB is
 compared in CIELAB space against every palette color and `empty_color` using Delta E 76.

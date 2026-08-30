@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from PIL import Image, ImageStat
 
-from patternproof.color import delta_e76, rgb_to_lab
+from patternproof.color import Lab, delta_e76, rgb_to_lab
 from patternproof.model import (
     AnalysisResult,
     CellResult,
@@ -68,20 +68,17 @@ def _sample_cell(
 
 
 def _classify(
-    pattern: Pattern,
     expected: str | None,
     observed: Rgb,
     threshold: float,
+    expected_lab: Lab,
+    candidate_labs: tuple[tuple[str | None, Lab], ...],
 ) -> tuple[str | None, CellStatus, float, float]:
     observed_lab = rgb_to_lab(observed)
-    expected_rgb = pattern.empty_rgb if expected is None else pattern.palette[expected].rgb
-    expected_delta = delta_e76(observed_lab, rgb_to_lab(expected_rgb))
-
-    candidates: list[tuple[str | None, Rgb]] = [(None, pattern.empty_rgb)]
-    candidates.extend((key, pattern.palette[key].rgb) for key in sorted(pattern.palette))
+    expected_delta = delta_e76(observed_lab, expected_lab)
     distances = [
-        (delta_e76(observed_lab, rgb_to_lab(rgb)), "" if key is None else key, key)
-        for key, rgb in candidates
+        (delta_e76(observed_lab, candidate_lab), "" if key is None else key, key)
+        for key, candidate_lab in candidate_labs
     ]
     nearest_delta, _, nearest = min(distances)
 
@@ -110,6 +107,11 @@ def analyze(
         raise ValueError(f"capture must contain no more than {MAX_IMAGE_PIXELS} decoded pixels")
 
     image = capture.convert("RGB")
+    candidate_labs = (
+        (None, rgb_to_lab(pattern.empty_rgb)),
+        *((key, rgb_to_lab(pattern.palette[key].rgb)) for key in sorted(pattern.palette)),
+    )
+    lab_by_key = dict(candidate_labs)
     cell_results: list[CellResult] = []
     for row_index, row in enumerate(pattern.cells):
         for column_index, expected in enumerate(row):
@@ -122,7 +124,11 @@ def analyze(
                 inset_fraction=options.inset_fraction,
             )
             nearest, status, expected_delta, nearest_delta = _classify(
-                pattern, expected, observed, options.delta_e_threshold
+                expected,
+                observed,
+                options.delta_e_threshold,
+                lab_by_key[expected],
+                candidate_labs,
             )
             cell_results.append(
                 CellResult(
