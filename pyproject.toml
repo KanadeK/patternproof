@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "patternproof"
+version = "0.1.0"
+description = "Compare physical grid crafts with their intended color-cell pattern"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "KanadeK", email = "121669563+KanadeK@users.noreply.github.com" },
+]
+keywords = ["craft", "diamond-painting", "fuse-beads", "image-analysis", "quality-control"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Graphics",
+]
+dependencies = ["pillow>=11.3,<13"]
+
+[project.urls]
+Homepage = "https://github.com/KanadeK/patternproof"
+Issues = "https://github.com/KanadeK/patternproof/issues"
+
+[project.scripts]
+patternproof = "patternproof.cli:main"
+
+[dependency-groups]
+dev = [
+  "build>=1.3,<2",
+  "mypy>=1.17,<2",
+  "pip-audit>=2.9,<3",
+  "pytest>=8.4,<9",
+  "pytest-cov>=6.2,<7",
+  "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/patternproof"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["patternproof"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+packages = ["patternproof"]
