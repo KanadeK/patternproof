@@ -45,6 +45,20 @@ def test_load_pattern_returns_immutable_rectangular_model(tmp_path: Path) -> Non
         (lambda data: data.update(cells=[["R"], ["G", "R"]]), "rectangular"),
         (lambda data: data.update(cells=[["UNKNOWN"]]), "unknown palette key"),
         (lambda data: data.update(palette={}), "palette"),
+        (lambda data: data.pop("name"), "missing field"),
+        (lambda data: data.update(name=""), "name"),
+        (lambda data: data.update(empty_color="not-a-color"), "empty_color"),
+        (lambda data: data.update(cells=[]), "non-empty array"),
+        (lambda data: data.update(cells=[[]]), "non-empty array"),
+        (
+            lambda data: data.update(
+                palette={
+                    "R": {"name": "Rose", "color": "#d84a62"},
+                    "G": {"name": "Leaf", "color": "#d84a62"},
+                }
+            ),
+            "duplicates palette color",
+        ),
     ],
 )
 def test_load_pattern_rejects_invalid_schema(
@@ -66,3 +80,13 @@ def test_load_pattern_rejects_invalid_json(tmp_path: Path) -> None:
 
     with pytest.raises(PatternInputError, match="valid JSON"):
         load_pattern(path)
+
+
+def test_load_pattern_rejects_non_object_root(tmp_path: Path) -> None:
+    with pytest.raises(PatternInputError, match="pattern: must be an object"):
+        load_pattern(write_pattern(tmp_path / "array.json", []))
+
+
+def test_load_pattern_reports_unreadable_path(tmp_path: Path) -> None:
+    with pytest.raises(PatternInputError, match="cannot read UTF-8 pattern"):
+        load_pattern(tmp_path / "missing.json")

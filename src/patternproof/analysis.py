@@ -17,7 +17,7 @@ from patternproof.model import (
     immutable_mapping,
 )
 
-_MAX_IMAGE_PIXELS = 40_000_000
+MAX_IMAGE_PIXELS = 40_000_000
 _MIN_CELL_PIXELS = 4
 
 
@@ -106,8 +106,8 @@ def analyze(
     _validate_options(options)
     if capture.width <= 0 or capture.height <= 0:
         raise ValueError("capture must have positive dimensions")
-    if capture.width * capture.height > _MAX_IMAGE_PIXELS:
-        raise ValueError(f"capture must contain no more than {_MAX_IMAGE_PIXELS} decoded pixels")
+    if capture.width * capture.height > MAX_IMAGE_PIXELS:
+        raise ValueError(f"capture must contain no more than {MAX_IMAGE_PIXELS} decoded pixels")
 
     image = capture.convert("RGB")
     cell_results: list[CellResult] = []
