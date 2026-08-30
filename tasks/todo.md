@@ -4,11 +4,11 @@
   - Acceptance: Selected concept has a documented, evidence-backed distinction.
   - Verify: `docs/RESEARCH.md` names local and public comparators and limitations.
   - Files: `docs/RESEARCH.md`
-- [ ] Task: Implement strict pattern loading and color classification
+- [x] Task: Implement strict pattern loading and color classification
   - Acceptance: Clean, wrong, empty, uncertain, and invalid cases have tests.
   - Verify: focused pytest files pass after their initial RED runs.
   - Files: `src/patternproof/model.py`, `loader.py`, `color.py`, `analysis.py`, tests
-- [ ] Task: Implement artifact generation and CLI
+- [x] Task: Implement artifact generation and CLI
   - Acceptance: four outputs agree and exit codes are stable.
   - Verify: integration and CLI tests pass.
   - Files: `reporting.py`, `cli.py`, tests
