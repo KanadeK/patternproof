@@ -12,7 +12,7 @@
   - Acceptance: four outputs agree and exit codes are stable.
   - Verify: integration and CLI tests pass.
   - Files: `reporting.py`, `cli.py`, tests
-- [ ] Task: Complete examples, documentation, CI, and packaging
+- [x] Task: Complete examples, documentation, CI, and packaging
   - Acceptance: release-equivalent gate passes at >=90% branch coverage.
   - Verify: `uv run python scripts/check.py`.
   - Files: examples, docs, workflows, `pyproject.toml`, `uv.lock`, scripts

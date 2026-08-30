@@ -1,0 +1,42 @@
+name: Bug report
+description: Report incorrect classification, input handling, or report behavior
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping make PatternProof's evidence more reliable.
+  - type: input
+    id: version
+    attributes:
+      label: PatternProof version
+      placeholder: patternproof 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and exit code
+      description: Remove private paths or names before posting.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and relevant cell evidence
+      description: Include coordinates and report values; attach sanitized inputs only.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Windows 11, Python 3.13, capture dimensions 512x512
+    validations:
+      required: true

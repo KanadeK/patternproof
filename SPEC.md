@@ -24,8 +24,8 @@ an overlay.
 ```console
 uv sync --locked --all-groups
 uv run pytest --cov=patternproof --cov-branch --cov-fail-under=90
-uv run ruff format --check .
-uv run ruff check .
+uv run ruff format --check src tests scripts
+uv run ruff check src tests scripts
 uv run mypy src tests scripts
 uv run python scripts/check.py
 uv build
