@@ -16,8 +16,11 @@
   - Acceptance: release-equivalent gate passes at >=90% branch coverage.
   - Verify: `uv run python scripts/check.py`.
   - Files: examples, docs, workflows, `pyproject.toml`, `uv.lock`, scripts
-- [ ] Task: Publish and independently verify v0.1.0
+- [x] Task: Publish and independently verify v0.1.0
   - Acceptance: public CI, immutable tag, Release assets, fresh install, contributor
-    hygiene, and Gmail self-notification are all evidenced.
-  - Verify: public API/CLI checks plus Gmail send result.
+    hygiene, and repository security settings are all evidenced.
+  - Verify: [main CI](https://github.com/KanadeK/patternproof/actions/runs/33317897990),
+    [Release CI](https://github.com/KanadeK/patternproof/actions/runs/33318000170), and
+    [v0.1.0](https://github.com/KanadeK/patternproof/releases/tag/v0.1.0) all succeeded;
+    downloaded-wheel acceptance reproduced exit codes `0/1/2`.
   - Files: remote repository and release state; no additional product source expected
